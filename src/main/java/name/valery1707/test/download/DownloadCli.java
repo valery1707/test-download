@@ -19,12 +19,12 @@ import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.apache.commons.io.IOUtils.closeQuietly;
 
 public class DownloadCli {
-	@SuppressWarnings("unused")
-	private static final int EXIT_OK = 0;
-	private static final int EXIT_ARGS_FAIL = 1;
 
 	public static void main(String[] args) throws IOException {
 		Args argv = parseArgs(args);
+		if (argv == null) {
+			return;
+		}
 		if (argv.isDebug()) {
 			System.out.println("argv.getThreadCount() = " + argv.getThreadCount());
 			System.out.println("argv.getSpeedLimit() = " + argv.getSpeedLimit());
@@ -46,7 +46,7 @@ public class DownloadCli {
 		} catch (ParameterException e) {
 			System.out.println(e.getMessage());
 			commander.usage();
-			System.exit(EXIT_ARGS_FAIL);
+			return null;
 		}
 		return argv;
 	}
