@@ -1,0 +1,6 @@
+https://github.com/FortAwesome/Font-Awesome/raw/master/fonts/FontAwesome.otf FontAwesome.otf
+https://github.com/FortAwesome/Font-Awesome/raw/master/fonts/fontawesome-webfont.eot fontAwesome-webFont.eot
+https://github.com/FortAwesome/Font-Awesome/raw/master/fonts/fontawesome-webfont.svg fontAwesome-webFont.svg
+https://github.com/FortAwesome/Font-Awesome/raw/master/fonts/fontawesome-webfont.ttf fontAwesome-webFont.ttf
+https://github.com/FortAwesome/Font-Awesome/raw/master/fonts/fontawesome-webfont.woff fontAwesome-webFont.woff
+https://github.com/FortAwesome/Font-Awesome/raw/master/fonts/fontawesome-webfont.woff2 fontAwesome-webFont.woff2

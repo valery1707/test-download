@@ -12,6 +12,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.List;
 
+import static name.valery1707.test.download.Utils.bytesToDisplaySize;
 import static name.valery1707.test.download.args.IsWritableDirTest.TMP_FILE_SUFFIX;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -35,7 +36,7 @@ public class DownloadCliTest {
 				file -> assertThat(!file.exists() || file.delete()).isTrue()
 		));
 
-		checkTempFiles();
+		checkTempFiles(true);
 
 		Args args = new Args();
 		args.setThreadCount(threadCount);
@@ -45,7 +46,7 @@ public class DownloadCliTest {
 		DownloadCli cli = new DownloadCli(args);
 		cli.download();
 
-		checkTempFiles();
+		checkTempFiles(false);
 
 		//Clear downloaded files
 		sources.forEach(source -> source.getTargetNames().stream().map(name -> new File(tmpDir, name)).forEach(
@@ -53,23 +54,81 @@ public class DownloadCliTest {
 						.exists()
 						.isFile()
 						.canRead()
-						.is(new Condition<>(File::delete, "Can delete file %s", file.getAbsolutePath()))
+						.is(canDelete())
 		));
+
+		assertThat(cli.getDownloads()).hasSameSizeAs(sources);
+		assertThat(cli.getTime()).isPositive();
+		assertThat(cli.getBytesCount()).isPositive();
+		assertThat(cli.getSpeed()).isPositive();
+
+		//Check speed
+		if (speedLimit != null) {
+			System.out.println(String.format("Reached overall speed %s/sec within limit %s/sec"
+					, bytesToDisplaySize(cli.getSpeed()), bytesToDisplaySize(speedLimit)
+			));
+			assertThat(cli.getSpeed()).isLessThan(speedLimit);
+			assertThat(cli.getTime()).isGreaterThanOrEqualTo(cli.getBytesCount() / speedLimit);
+		}
 
 		return cli;
 	}
 
-	private void checkTempFiles() {
+	private void checkTempFiles(boolean canClear) {
 		File[] files = tmpDir.listFiles((FilenameFilter) new AndFileFilter(new PrefixFileFilter("download"), new SuffixFileFilter(".tmp")));
-		assertThat(files).isEmpty();
+		if (canClear) {
+			assertThat(files).are(canDelete());
+		} else {
+			assertThat(files).isEmpty();
+		}
+	}
+
+	private static Condition<File> canDelete() {
+		return new Condition<>(File::delete, "Can delete file");
 	}
 
 	@Test(timeout = 10_000/*10 seconds*/)
+	@SuppressWarnings("unused")
 	public void downloadUrlList1_thread1_speedAny() throws Exception {
 		DownloadCli cli = downloadUrlList("/url_list_1.txt", 1, null);
-		assertThat(cli.getDownloads()).hasSize(2);
-		assertThat(cli.getTime()).isPositive();
-		assertThat(cli.getBytesCount()).isPositive();
-		assertThat(cli.getSpeed()).isPositive();
+	}
+
+	@Test(timeout = 10_000/*10 seconds*/)
+	@SuppressWarnings("unused")
+	public void downloadUrlList1_thread2_speedAny() throws Exception {
+		DownloadCli cli = downloadUrlList("/url_list_1.txt", 2, null);
+	}
+
+	/**
+	 * Download about 68 KiB with speed 2 KiB/sec take about 35 seconds
+	 */
+	@Test(timeout = 40_000/*40 seconds*/)
+	@SuppressWarnings("unused")
+	public void downloadUrlList1_thread1_speed2K() throws Exception {
+		DownloadCli cli = downloadUrlList("/url_list_1.txt", 1, 2 * 1024L);
+	}
+
+	/**
+	 * Download about 68 KiB with speed 2 KiB/sec take about 35 seconds
+	 */
+	@Test(timeout = 40_000/*40 seconds*/)
+	@SuppressWarnings("unused")
+	public void downloadUrlList1_thread2_speed2K() throws Exception {
+		DownloadCli cli = downloadUrlList("/url_list_1.txt", 2, 2 * 1024L);
+	}
+
+	/**
+	 * Download about 260 KiB with speed 10 KiB/sec take about 26 seconds
+	 */
+	@Test(timeout = 50_000/*50 seconds*/)
+	@SuppressWarnings("unused")
+	public void downloadJQuery_thread1_speed10K() throws Exception {
+		DownloadCli cli = downloadUrlList("/jQuery.txt", 1, 10 * 1024L);
+	}
+
+	@Test(timeout = 120_000/*120 seconds*/)
+	@SuppressWarnings("unused")
+	public void downloadFontAwesome_thread10_speed100K() throws Exception {
+		DownloadCli cli = downloadUrlList("/Font-Awesome.txt", 10, 100 * 1024L);
 	}
 }
