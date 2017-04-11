@@ -15,6 +15,7 @@ buildscript {
 
 apply plugin: 'java'
 apply plugin: 'org.springframework.boot'
+apply plugin: 'jacoco'
 
 sourceCompatibility = 1.8
 
@@ -31,4 +32,14 @@ dependencies {
 	testCompile group: 'junit', name: 'junit', version: '4.12'
 	testCompile 'org.assertj:assertj-core:3.6.2'
 	testCompile 'org.mockito:mockito-core:2.7.22'
+}
+
+jacoco {
+	toolVersion = "0.7.9"
+}
+jacocoTestReport {
+	reports {
+		xml.enabled = true
+		html.enabled = true
+	}
 }

@@ -1,4 +1,5 @@
 Консольная утилита для скачивания файлов по HTTP протоколу.
+
 [![Build Status](https://travis-ci.org/valery1707/test-download.svg)](https://travis-ci.org/valery1707/test-download)
 
 ### Входные параметры:
@@ -37,3 +38,11 @@
 Пример вызова:
 
 	java -jar download-cli.jar -n 5 -l 2000k -o output_folder -f links.txt
+
+### Сборка
+
+Полная сборка с тестами: `./gradlew build`
+
+Сборка с отчётов покрытия тестами: `./gradlew build jacocoTestReport`
+
+Сам отчёт находится в файле `build/reports/jacoco/test/html/index.html`
