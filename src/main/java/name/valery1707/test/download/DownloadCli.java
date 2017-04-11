@@ -129,7 +129,7 @@ public class DownloadCli {
 		return CompletableFuture.supplyAsync(() -> {
 					try {
 						return downloadSync(source, semaphore);
-					} catch (IOException | InterruptedException e) {
+					} catch (InterruptedException e) {
 						throw new IllegalStateException(e);
 					}
 				}
@@ -139,7 +139,7 @@ public class DownloadCli {
 
 	private static final int IN_MEMORY_THRESHOLD = 10 * 1024;//10 KiB
 
-	private Download downloadSync(Source source, TimedSemaphore semaphore) throws IOException, InterruptedException {
+	private Download downloadSync(Source source, TimedSemaphore semaphore) throws InterruptedException {
 		long start = System.currentTimeMillis();
 		DeferredFileOutputStream out = new DeferredFileOutputStream(IN_MEMORY_THRESHOLD, "download", ".tmp", null);
 		try {
@@ -149,6 +149,8 @@ public class DownloadCli {
 			InputStream in = new URL(source.getUrl()).openStream();
 			copy(in, out, semaphore);
 			return new Download(source, out, System.currentTimeMillis() - start);
+		} catch (IOException e) {
+			return new Download(source, null, System.currentTimeMillis() - start);
 		} finally {
 			closeQuietly(out);
 			if (argv.isDebug()) {
@@ -182,6 +184,9 @@ public class DownloadCli {
 
 	private Download save(Download download, File targetDirectory) {
 		DeferredFileOutputStream stream = download.getStream();
+		if (stream == null) {
+			return download;
+		}
 
 		download.getSource().getTargetNames()
 				.forEach(name -> {

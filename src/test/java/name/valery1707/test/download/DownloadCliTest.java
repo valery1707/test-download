@@ -92,7 +92,9 @@ public class DownloadCliTest {
 						.is(canDelete())
 		));
 
-		assertThat(cli.getDownloads()).hasSameSizeAs(sources);
+		assertThat(cli.getDownloads())
+				.hasSameSizeAs(sources)
+				.are(new Condition<>(download -> download.getTime() > 0, "Has positive time"));
 		assertThat(cli.getTime()).isPositive();
 		assertThat(cli.getBytesCount()).isPositive();
 		assertThat(cli.getSpeed()).isPositive();
@@ -165,5 +167,22 @@ public class DownloadCliTest {
 	@SuppressWarnings("unused")
 	public void downloadFontAwesome_thread10_speed100K() throws Exception {
 		DownloadCli cli = downloadUrlList("/Font-Awesome.txt", 10, 100 * 1024L);
+	}
+
+	@Test
+	@SuppressWarnings("unused")
+	public void download_invalidLinks() throws Exception {
+		File sourceFile = sourceFile("/invalid.txt");
+
+		Args args = new Args();
+		args.setSourceFile(sourceFile);
+		args.setTargetDirectory(tmpDir);
+		DownloadCli cli = new DownloadCli(args);
+		cli.download();
+		cli.download();
+
+		assertThat(cli.getDownloads())
+				.hasSize(1)
+				.are(new Condition<>(d -> d.getStream() == null, "Link is broken"));
 	}
 }
