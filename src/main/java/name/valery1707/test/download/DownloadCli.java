@@ -19,6 +19,7 @@ import java.util.concurrent.Executors;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
+import static name.valery1707.test.download.Utils.bytesToDisplaySize;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.apache.commons.io.IOUtils.closeQuietly;
 
@@ -64,12 +65,22 @@ public class DownloadCli {
 		this.argv = argv;
 	}
 
+	/**
+	 * @return Time in milliseconds
+	 */
 	public long getTime() {
 		return time;
 	}
 
+	/**
+	 * @return Total downloaded bytes count
+	 */
 	public long getBytesCount() {
 		return downloads.stream().mapToLong(download -> download.getStream().getByteCount()).sum();
+	}
+
+	public double getSpeed() {
+		return getBytesCount() / (getTime() / 1000.0);
 	}
 
 	public List<Download> getDownloads() {
@@ -77,7 +88,7 @@ public class DownloadCli {
 	}
 
 	private String getTotalLine() {
-		return String.format("Download %d bytes in %.3f seconds. ", getBytesCount(), (time / 1000.0));
+		return String.format("Download %d bytes in %.3f seconds.%nOverall speed %s/second", getBytesCount(), (time / 1000.0), bytesToDisplaySize(getSpeed()));
 	}
 
 	public List<Download> download() throws IOException {

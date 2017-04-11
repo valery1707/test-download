@@ -69,5 +69,7 @@ public class DownloadCliTest {
 		DownloadCli cli = downloadUrlList("/url_list_1.txt", 1, null);
 		assertThat(cli.getDownloads()).hasSize(2);
 		assertThat(cli.getTime()).isPositive();
+		assertThat(cli.getBytesCount()).isPositive();
+		assertThat(cli.getSpeed()).isPositive();
 	}
 }
