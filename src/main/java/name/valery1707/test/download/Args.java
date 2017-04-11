@@ -1,6 +1,7 @@
 package name.valery1707.test.download;
 
 import com.beust.jcommander.Parameter;
+import name.valery1707.test.download.args.BytesConverter;
 import name.valery1707.test.download.args.GreaterThenZero;
 import name.valery1707.test.download.args.IsReadableFile;
 import name.valery1707.test.download.args.IsWritableDir;
@@ -20,9 +21,9 @@ public class Args {
 			, description =
 			"Overall speed limit for all threads."
 			+ " Dimension: byte per second."
-//			+ " Can use suffixes (K,M,...). Lowercase is multiply by 1000. Uppercase is multiply by 1024."
+			+ " Can use suffixes (K,M,...) with lower/upper case. Lowercase is multiply by 1000. Uppercase is multiply by 1024."
 			, validateValueWith = GreaterThenZero.class
-//			, converter = BytesConverter.class
+			, converter = BytesConverter.class
 	)
 	private Long speedLimit;
 
