@@ -51,11 +51,11 @@ public class Args {
 		this.threadCount = threadCount;
 	}
 
-	public long getSpeedLimit() {
+	public Long getSpeedLimit() {
 		return speedLimit;
 	}
 
-	public void setSpeedLimit(long speedLimit) {
+	public void setSpeedLimit(Long speedLimit) {
 		this.speedLimit = speedLimit;
 	}
 
