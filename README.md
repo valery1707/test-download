@@ -1,6 +1,7 @@
 Консольная утилита для скачивания файлов по HTTP протоколу.
 
 [![Build Status](https://travis-ci.org/valery1707/test-download.svg)](https://travis-ci.org/valery1707/test-download)
+[![Coverage Status](https://coveralls.io/repos/valery1707/test-download/badge.svg?branch=master&service=github)](https://coveralls.io/github/valery1707/test-download?branch=master)
 
 ### Входные параметры:
 

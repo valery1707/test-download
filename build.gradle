@@ -1,6 +1,3 @@
-group 'name.valery1707.test.download'
-version '1.0-SNAPSHOT'
-
 buildscript {
 	ext {
 		springBootVersion = '1.5.2.RELEASE'
@@ -13,10 +10,16 @@ buildscript {
 	}
 }
 
+plugins {
+	id 'com.github.kt3k.coveralls' version '2.8.1'
+}
+
 apply plugin: 'java'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'jacoco'
 
+group 'name.valery1707.test.download'
+version '1.0-SNAPSHOT'
 sourceCompatibility = 1.8
 
 repositories {
