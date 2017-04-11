@@ -53,6 +53,8 @@ hs_err_pid*
 *.iws
 
 ## Plugin-specific files:
+.idea/markdown-exported-files.xml
+.idea/markdown-navigator.xml
 
 # IntelliJ
 /out/
