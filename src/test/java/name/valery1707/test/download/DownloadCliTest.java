@@ -54,7 +54,7 @@ public class DownloadCliTest {
 	@Test(timeout = 10_000/*10 seconds*/)
 	public void downloadUrlList1_thread1_speedAny() throws Exception {
 		DownloadCli cli = downloadUrlList("/url_list_1.txt", 1, null);
-		assertThat(cli.download()).hasSize(2);
+		assertThat(cli.getDownloads()).hasSize(2);
 		assertThat(cli.getTime()).isPositive();
 	}
 }

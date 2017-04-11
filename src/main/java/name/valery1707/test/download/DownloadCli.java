@@ -16,6 +16,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.io.IOUtils.closeQuietly;
@@ -68,6 +69,10 @@ public class DownloadCli {
 
 	public long getBytesCount() {
 		return downloads.stream().mapToLong(download -> download.getStream().getByteCount()).sum();
+	}
+
+	public List<Download> getDownloads() {
+		return unmodifiableList(downloads);
 	}
 
 	private String getTotalLine() {
