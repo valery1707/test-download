@@ -2,11 +2,23 @@ package name.valery1707.test.download;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.DeferredFileOutputStream;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.io.IOUtils.closeQuietly;
 
 public class DownloadCli {
 	@SuppressWarnings("unused")
@@ -20,7 +32,11 @@ public class DownloadCli {
 		System.out.println("argv.getSourceFile() = " + argv.getSourceFile());
 		System.out.println("argv.getTargetDirectory() = " + argv.getTargetDirectory());
 		DownloadCli cli = new DownloadCli(argv);
-		cli.download();
+		long time = System.currentTimeMillis();
+		List<Download> downloads = cli.download();
+		time = System.currentTimeMillis() - time;
+		long byteCount = downloads.stream().mapToLong(download -> download.getStream().getByteCount()).sum();
+		System.out.println(String.format("Download %d bytes in %.3f seconds. ", byteCount, (time / 1000.0)));
 	}
 
 	private static Args parseArgs(String[] args) {
@@ -44,11 +60,69 @@ public class DownloadCli {
 		this.argv = argv;
 	}
 
-	private void download() throws IOException {
-		Map<String, Set<String>> source = SourceLoader.load(argv.getSourceFile());
+	private List<Download> download() throws IOException {
+		List<Source> sources = SourceLoader.load(argv.getSourceFile());
 		System.out.println("Will download:");
-		source.forEach((url, files) ->
-				System.out.println("  From '" + url + "' into " + files.stream().collect(Collectors.joining(", ", "[", "]")))
+		sources.forEach(source ->
+				System.out.println("  From '" + source.getUrl() + "' into " + source.getTargetNames().stream().collect(joining(", ", "[", "]")))
+		);
+		ExecutorService threadPool = Executors.newFixedThreadPool(argv.getThreadCount());
+		List<CompletableFuture<Download>> downloadFutures = sources.stream()
+				.map(source -> downloadAsync(source, threadPool).thenApply(download -> save(download, argv.getTargetDirectory())))
+				.collect(toList());
+		CompletableFuture<List<Download>> downloadsFuture = sequence(downloadFutures);
+		threadPool.shutdown();
+		return downloadsFuture.join();
+	}
+
+	private CompletableFuture<Download> downloadAsync(Source source, Executor threadPool) {
+		return CompletableFuture.supplyAsync(() -> {
+					try {
+						return downloadSync(source);
+					} catch (IOException e) {
+						throw new IllegalStateException(e);
+					}
+				}
+				, threadPool
+		);
+	}
+
+	private static final int IN_MEMORY_THRESHOLD = 10 * 1024;//10 KiB
+
+	private Download downloadSync(Source source) throws IOException {
+		long start = System.currentTimeMillis();
+		DeferredFileOutputStream out = new DeferredFileOutputStream(IN_MEMORY_THRESHOLD, "downloadAsync", ".tmp", null);
+		try {
+			InputStream in = new URL(source.getUrl()).openStream();
+			IOUtils.copy(in, out);
+			return new Download(source, out, System.currentTimeMillis() - start);
+		} finally {
+			closeQuietly(out);
+		}
+	}
+
+	private Download save(Download download, File targetDirectory) {
+		DeferredFileOutputStream stream = download.getStream();
+
+		download.getSource().getTargetNames()
+				.forEach(name -> {
+							try {
+								stream.writeTo(new FileOutputStream(new File(targetDirectory, name), false));
+							} catch (IOException e) {
+								throw new IllegalStateException("Could not write content into " + name);
+							}
+						}
+				);
+		closeQuietly(stream);
+		return download;
+	}
+
+	private static <T> CompletableFuture<List<T>> sequence(List<CompletableFuture<T>> futures) {
+		CompletableFuture<Void> allDoneFuture = CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
+		return allDoneFuture.thenApply(v ->
+				futures.stream()
+						.map(CompletableFuture::join)
+						.collect(toList())
 		);
 	}
 }

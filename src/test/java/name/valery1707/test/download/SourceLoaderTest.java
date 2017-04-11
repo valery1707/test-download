@@ -7,8 +7,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Map;
-import java.util.Set;
+import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static name.valery1707.test.download.args.IsWritableDirTest.TMP_FILE_SUFFIX;
@@ -30,8 +29,8 @@ public class SourceLoaderTest {
 
 	@Test
 	public void loadFileEmpty() throws Exception {
-		Map<String, Set<String>> map = SourceLoader.load(tmp);
-		assertThat(map).isEmpty();
+		List<Source> sources = SourceLoader.load(tmp);
+		assertThat(sources).isEmpty();
 	}
 
 	@Test
@@ -39,12 +38,12 @@ public class SourceLoaderTest {
 		FileUtils.writeLines(tmp, UTF_8.name(), Arrays.asList(
 				"https://github.com/fluidicon.png fluid-icon.png"
 		));
-		Map<String, Set<String>> map = SourceLoader.load(tmp);
-		assertThat(map)
+		List<Source> sources = SourceLoader.load(tmp);
+		assertThat(sources)
 				.hasSize(1)
-				.containsOnlyKeys("https://github.com/fluidicon.png")
 		;
-		assertThat(map.get("https://github.com/fluidicon.png"))
+		assertThat(sources.get(0).getUrl()).isEqualTo("https://github.com/fluidicon.png");
+		assertThat(sources.get(0).getTargetNames())
 				.hasSize(1)
 				.containsExactly("fluid-icon.png")
 		;
@@ -56,16 +55,17 @@ public class SourceLoaderTest {
 				"https://github.com/fluidicon.png fluid-icon.png",
 				"https://assets-cdn.github.com/images/modules/open_graph/github-octocat.png github-octocat.png"
 		));
-		Map<String, Set<String>> map = SourceLoader.load(tmp);
-		assertThat(map)
+		List<Source> sources = SourceLoader.load(tmp);
+		assertThat(sources)
 				.hasSize(2)
-				.containsOnlyKeys("https://github.com/fluidicon.png", "https://assets-cdn.github.com/images/modules/open_graph/github-octocat.png")
 		;
-		assertThat(map.get("https://github.com/fluidicon.png"))
+		assertThat(sources.get(0).getUrl()).isEqualTo("https://github.com/fluidicon.png");
+		assertThat(sources.get(0).getTargetNames())
 				.hasSize(1)
 				.containsExactly("fluid-icon.png")
 		;
-		assertThat(map.get("https://assets-cdn.github.com/images/modules/open_graph/github-octocat.png"))
+		assertThat(sources.get(1).getUrl()).isEqualTo("https://assets-cdn.github.com/images/modules/open_graph/github-octocat.png");
+		assertThat(sources.get(1).getTargetNames())
 				.hasSize(1)
 				.containsExactly("github-octocat.png")
 		;
@@ -77,12 +77,12 @@ public class SourceLoaderTest {
 				"https://github.com/fluidicon.png fluid-icon.png",
 				"https://github.com/fluidicon.png fluid-icon2.png"
 		));
-		Map<String, Set<String>> map = SourceLoader.load(tmp);
-		assertThat(map)
+		List<Source> sources = SourceLoader.load(tmp);
+		assertThat(sources)
 				.hasSize(1)
-				.containsOnlyKeys("https://github.com/fluidicon.png")
 		;
-		assertThat(map.get("https://github.com/fluidicon.png"))
+		assertThat(sources.get(0).getUrl()).isEqualTo("https://github.com/fluidicon.png");
+		assertThat(sources.get(0).getTargetNames())
 				.hasSize(2)
 				.containsExactly("fluid-icon.png", "fluid-icon2.png")
 		;
