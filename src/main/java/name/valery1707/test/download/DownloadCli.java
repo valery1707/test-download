@@ -34,11 +34,8 @@ public class DownloadCli {
 			System.out.println("argv.getTargetDirectory() = " + argv.getTargetDirectory());
 		}
 		DownloadCli cli = new DownloadCli(argv);
-		long time = System.currentTimeMillis();
-		List<Download> downloads = cli.download();
-		time = System.currentTimeMillis() - time;
-		long byteCount = downloads.stream().mapToLong(download -> download.getStream().getByteCount()).sum();
-		System.out.println(String.format("Download %d bytes in %.3f seconds. ", byteCount, (time / 1000.0)));
+		cli.download();
+		System.out.println(cli.getTotalLine());
 	}
 
 	private static Args parseArgs(String[] args) {
@@ -57,26 +54,46 @@ public class DownloadCli {
 	}
 
 	private final Args argv;
+	private List<Source> sources;
+	private List<Download> downloads;
+	private long time;
 
 	public DownloadCli(Args argv) {
 		this.argv = argv;
 	}
 
-	private List<Download> download() throws IOException {
-		List<Source> sources = SourceLoader.load(argv.getSourceFile());
+	public long getTime() {
+		return time;
+	}
+
+	public long getBytesCount() {
+		return downloads.stream().mapToLong(download -> download.getStream().getByteCount()).sum();
+	}
+
+	private String getTotalLine() {
+		return String.format("Download %d bytes in %.3f seconds. ", getBytesCount(), (time / 1000.0));
+	}
+
+	public List<Download> download() throws IOException {
+		if (sources == null) {
+			sources = SourceLoader.load(argv.getSourceFile());
+		}
 		if (argv.isDebug()) {
 			System.out.println("Will download:");
 			sources.forEach(source ->
 					System.out.println("  From '" + source.getUrl() + "' into " + source.getTargetNames().stream().collect(joining(", ", "[", "]")))
 			);
 		}
+		time = System.currentTimeMillis();
 		ExecutorService threadPool = Executors.newFixedThreadPool(argv.getThreadCount());
 		List<CompletableFuture<Download>> downloadFutures = sources.stream()
 				.map(source -> downloadAsync(source, threadPool).thenApply(download -> save(download, argv.getTargetDirectory())))
 				.collect(toList());
 		CompletableFuture<List<Download>> downloadsFuture = sequence(downloadFutures);
 		threadPool.shutdown();
-		return downloadsFuture.join();
+		downloads = downloadsFuture.join();
+		time = System.currentTimeMillis() - time;
+		return downloads;
 	}
 
 	private CompletableFuture<Download> downloadAsync(Source source, Executor threadPool) {
