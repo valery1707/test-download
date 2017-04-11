@@ -104,7 +104,7 @@ public class DownloadCliTest {
 			System.out.println(String.format("Reached overall speed %s/sec within limit %s/sec"
 					, bytesToDisplaySize(cli.getSpeed()), bytesToDisplaySize(speedLimit)
 			));
-			assertThat(cli.getSpeed()).isLessThan(speedLimit);
+			assertThat(cli.getSpeed()).isLessThanOrEqualTo(speedLimit);
 			assertThat(cli.getTime()).isGreaterThanOrEqualTo(cli.getBytesCount() / speedLimit);
 		}
 
