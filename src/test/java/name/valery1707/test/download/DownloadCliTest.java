@@ -1,5 +1,6 @@
 package name.valery1707.test.download;
 
+import org.assertj.core.api.Condition;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -37,6 +38,15 @@ public class DownloadCliTest {
 		args.setTargetDirectory(tmpDir);
 		DownloadCli cli = new DownloadCli(args);
 		cli.download();
+
+		//Clear downloaded files
+		sources.forEach(source -> source.getTargetNames().stream().map(name -> new File(tmpDir, name)).forEach(
+				file -> assertThat(file)
+						.exists()
+						.isFile()
+						.canRead()
+						.is(new Condition<>(File::delete, "Can delete file %s", file.getAbsolutePath()))
+		));
 
 		return cli;
 	}

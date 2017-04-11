@@ -134,7 +134,9 @@ public class DownloadCli {
 		download.getSource().getTargetNames()
 				.forEach(name -> {
 							try {
-								stream.writeTo(new FileOutputStream(new File(targetDirectory, name), false));
+								FileOutputStream out = new FileOutputStream(new File(targetDirectory, name), false);
+								stream.writeTo(out);
+								out.close();
 							} catch (IOException e) {
 								throw new IllegalStateException("Could not write content into " + name);
 							}
