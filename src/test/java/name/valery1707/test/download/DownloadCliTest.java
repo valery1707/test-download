@@ -1,10 +1,14 @@
 package name.valery1707.test.download;
 
+import org.apache.commons.io.filefilter.AndFileFilter;
+import org.apache.commons.io.filefilter.PrefixFileFilter;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.assertj.core.api.Condition;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.List;
 
@@ -31,6 +35,8 @@ public class DownloadCliTest {
 				file -> assertThat(!file.exists() || file.delete()).isTrue()
 		));
 
+		checkTempFiles();
+
 		Args args = new Args();
 		args.setThreadCount(threadCount);
 		args.setSpeedLimit(speedLimit);
@@ -38,6 +44,8 @@ public class DownloadCliTest {
 		args.setTargetDirectory(tmpDir);
 		DownloadCli cli = new DownloadCli(args);
 		cli.download();
+
+		checkTempFiles();
 
 		//Clear downloaded files
 		sources.forEach(source -> source.getTargetNames().stream().map(name -> new File(tmpDir, name)).forEach(
@@ -49,6 +57,11 @@ public class DownloadCliTest {
 		));
 
 		return cli;
+	}
+
+	private void checkTempFiles() {
+		File[] files = tmpDir.listFiles((FilenameFilter) new AndFileFilter(new PrefixFileFilter("download"), new SuffixFileFilter(".tmp")));
+		assertThat(files).isEmpty();
 	}
 
 	@Test(timeout = 10_000/*10 seconds*/)

@@ -19,6 +19,7 @@ import java.util.concurrent.Executors;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.apache.commons.io.IOUtils.closeQuietly;
 
 public class DownloadCli {
@@ -117,7 +118,7 @@ public class DownloadCli {
 
 	private Download downloadSync(Source source) throws IOException {
 		long start = System.currentTimeMillis();
-		DeferredFileOutputStream out = new DeferredFileOutputStream(IN_MEMORY_THRESHOLD, "downloadAsync", ".tmp", null);
+		DeferredFileOutputStream out = new DeferredFileOutputStream(IN_MEMORY_THRESHOLD, "download", ".tmp", null);
 		try {
 			if (argv.isDebug()) {
 				System.out.println(String.format("Start '%s' in thread '%s'", source.getUrl(), Thread.currentThread().getName()));
@@ -147,7 +148,9 @@ public class DownloadCli {
 							}
 						}
 				);
-		closeQuietly(stream);
+		if (!stream.isInMemory()) {
+			deleteQuietly(stream.getFile());
+		}
 		return download;
 	}
 
