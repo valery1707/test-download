@@ -27,10 +27,12 @@ public class DownloadCli {
 
 	public static void main(String[] args) throws IOException {
 		Args argv = parseArgs(args);
-		System.out.println("argv.getThreadCount() = " + argv.getThreadCount());
-		System.out.println("argv.getSpeedLimit() = " + argv.getSpeedLimit());
-		System.out.println("argv.getSourceFile() = " + argv.getSourceFile());
-		System.out.println("argv.getTargetDirectory() = " + argv.getTargetDirectory());
+		if (argv.isDebug()) {
+			System.out.println("argv.getThreadCount() = " + argv.getThreadCount());
+			System.out.println("argv.getSpeedLimit() = " + argv.getSpeedLimit());
+			System.out.println("argv.getSourceFile() = " + argv.getSourceFile());
+			System.out.println("argv.getTargetDirectory() = " + argv.getTargetDirectory());
+		}
 		DownloadCli cli = new DownloadCli(argv);
 		long time = System.currentTimeMillis();
 		List<Download> downloads = cli.download();
@@ -62,10 +64,12 @@ public class DownloadCli {
 
 	private List<Download> download() throws IOException {
 		List<Source> sources = SourceLoader.load(argv.getSourceFile());
-		System.out.println("Will download:");
-		sources.forEach(source ->
-				System.out.println("  From '" + source.getUrl() + "' into " + source.getTargetNames().stream().collect(joining(", ", "[", "]")))
-		);
+		if (argv.isDebug()) {
+			System.out.println("Will download:");
+			sources.forEach(source ->
+					System.out.println("  From '" + source.getUrl() + "' into " + source.getTargetNames().stream().collect(joining(", ", "[", "]")))
+			);
+		}
 		ExecutorService threadPool = Executors.newFixedThreadPool(argv.getThreadCount());
 		List<CompletableFuture<Download>> downloadFutures = sources.stream()
 				.map(source -> downloadAsync(source, threadPool).thenApply(download -> save(download, argv.getTargetDirectory())))
@@ -93,11 +97,17 @@ public class DownloadCli {
 		long start = System.currentTimeMillis();
 		DeferredFileOutputStream out = new DeferredFileOutputStream(IN_MEMORY_THRESHOLD, "downloadAsync", ".tmp", null);
 		try {
+			if (argv.isDebug()) {
+				System.out.println(String.format("Start '%s' in thread '%s'", source.getUrl(), Thread.currentThread().getName()));
+			}
 			InputStream in = new URL(source.getUrl()).openStream();
 			IOUtils.copy(in, out);
 			return new Download(source, out, System.currentTimeMillis() - start);
 		} finally {
 			closeQuietly(out);
+			if (argv.isDebug()) {
+				System.out.println(String.format("Complete '%s' in thread '%s'", source.getUrl(), Thread.currentThread().getName()));
+			}
 		}
 	}
 

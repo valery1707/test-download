@@ -43,6 +43,13 @@ public class Args {
 	)
 	private File targetDirectory;
 
+	@Parameter(
+			names = {"--debug"}
+			, description = "Enable debug output"
+			, hidden = true
+	)
+	private boolean debug = false;
+
 	public int getThreadCount() {
 		return threadCount;
 	}
@@ -73,5 +80,13 @@ public class Args {
 
 	public void setTargetDirectory(File targetDirectory) {
 		this.targetDirectory = targetDirectory;
+	}
+
+	public boolean isDebug() {
+		return debug;
+	}
+
+	public void setDebug(boolean debug) {
+		this.debug = debug;
 	}
 }
