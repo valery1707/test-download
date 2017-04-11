@@ -1,4 +1,5 @@
 Консольная утилита для скачивания файлов по HTTP протоколу.
+[![Build Status](https://travis-ci.org/valery1707/test-download.svg)](https://travis-ci.org/valery1707/test-download)
 
 ### Входные параметры:
 
