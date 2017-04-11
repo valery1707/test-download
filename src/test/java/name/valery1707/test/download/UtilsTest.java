@@ -17,4 +17,10 @@ public class UtilsTest {
 		assertThat(Utils.bytesToDisplaySize(1024)).describedAs("1024").isEqualTo("1.00 KiB");
 		assertThat(Utils.bytesToDisplaySize(5000)).describedAs("5000").isEqualTo("4.88 KiB");
 	}
+
+	@Test
+	public void tooBig() throws Exception {
+		double value = 1.256 * Math.pow(1024, 9);
+		assertThat(Utils.bytesToDisplaySize(value)).isEqualTo("1.26 Unknown(9)");
+	}
 }

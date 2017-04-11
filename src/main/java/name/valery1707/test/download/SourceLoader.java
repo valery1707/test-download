@@ -13,7 +13,11 @@ import java.util.stream.Collectors;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.singleton;
 
-public class SourceLoader {
+public final class SourceLoader {
+	SourceLoader() {
+		throw new IllegalStateException("Must not be created directly");
+	}
+
 	public static List<Source> load(File sourceFile) throws IOException {
 		List<String> lines = FileUtils.readLines(sourceFile, UTF_8);
 		return lines.stream()

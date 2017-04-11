@@ -77,6 +77,7 @@ public class DownloadCliTest {
 		args.setSpeedLimit(speedLimit);
 		args.setSourceFile(sourceFile);
 		args.setTargetDirectory(tmpDir);
+		args.setDebug(false);
 		DownloadCli cli = new DownloadCli(args);
 		cli.download();
 

@@ -17,6 +17,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class SourceLoaderTest {
 	private File tmp;
 
+	@Test(expected = IllegalStateException.class)
+	public void createDirectly() throws Exception {
+		new SourceLoader();
+	}
+
 	@Before
 	public void setUp() throws Exception {
 		tmp = File.createTempFile("Download", TMP_FILE_SUFFIX);
