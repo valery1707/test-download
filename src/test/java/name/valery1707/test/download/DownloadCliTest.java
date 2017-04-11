@@ -26,9 +26,43 @@ public class DownloadCliTest {
 		assertThat(tmp.delete()).isTrue();
 	}
 
-	private DownloadCli downloadUrlList(String sourcePath, int threadCount, Long speedLimit) throws IOException {
+	@Test
+	public void cli_urlList1_thread1_speedAny_debug() throws Exception {
+		DownloadCli.main(new String[]{
+				"-f ",
+				sourceFile("/url_list_1.txt").getAbsolutePath(),
+				"-o ",
+				tmpDir.getAbsolutePath(),
+				"--debug",
+		});
+	}
+
+	@Test
+	public void cli_urlList1_thread5_speedAny() throws Exception {
+		DownloadCli.main(new String[]{
+				"-f ",
+				sourceFile("/url_list_1.txt").getAbsolutePath(),
+				"-o ",
+				tmpDir.getAbsolutePath(),
+				"-n",
+				"5",
+		});
+	}
+
+	@Test
+	public void cli_usage() throws Exception {
+		DownloadCli.main(new String[]{
+		});
+	}
+
+	private File sourceFile(String sourcePath) {
 		File sourceFile = new File(this.getClass().getResource(sourcePath).getFile());
 		assertThat(sourceFile).exists().isFile().canRead();
+		return sourceFile;
+	}
+
+	private DownloadCli downloadUrlList(String sourcePath, int threadCount, Long speedLimit) throws IOException {
+		File sourceFile = sourceFile(sourcePath);
 
 		//Clear downloaded files
 		List<Source> sources = SourceLoader.load(sourceFile);
