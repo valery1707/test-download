@@ -17,7 +17,7 @@ public class SourceLoaderTest {
 	public static final String TMP_FILE_SUFFIX = ".tmp";
 	private File tmp;
 
-	@Test(expected = IllegalStateException.class)
+	@Test(expected = UnsupportedOperationException.class)
 	public void createDirectly() throws Exception {
 		new SourceLoader();
 	}

@@ -6,7 +6,7 @@ import java.util.Locale;
 
 public final class Utils {
 	Utils() {
-		throw new IllegalStateException("Must not be created directly");
+		throw new UnsupportedOperationException("Must not be created directly");
 	}
 
 	private static final String[] bytesSuffixes = new String[]{"B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"};

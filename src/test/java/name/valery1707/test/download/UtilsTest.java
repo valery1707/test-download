@@ -5,7 +5,7 @@ import org.junit.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class UtilsTest {
-	@Test(expected = IllegalStateException.class)
+	@Test(expected = UnsupportedOperationException.class)
 	public void createDirectly() throws Exception {
 		new Utils();
 	}

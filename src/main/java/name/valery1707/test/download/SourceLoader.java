@@ -15,7 +15,7 @@ import static java.util.Collections.singleton;
 
 public final class SourceLoader {
 	SourceLoader() {
-		throw new IllegalStateException("Must not be created directly");
+		throw new UnsupportedOperationException("Must not be created directly");
 	}
 
 	public static List<Source> load(File sourceFile) throws IOException {
