@@ -10,11 +10,11 @@ import java.util.Arrays;
 import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static name.valery1707.test.download.args.IsWritableDirTest.TMP_FILE_SUFFIX;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("ArraysAsListWithZeroOrOneArgument")
 public class SourceLoaderTest {
+	public static final String TMP_FILE_SUFFIX = ".tmp";
 	private File tmp;
 
 	@Test(expected = IllegalStateException.class)

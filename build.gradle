@@ -29,6 +29,8 @@ repositories {
 dependencies {
 	//"Because life is too short to parse command line parameters"
 	compile 'com.beust:jcommander:1.64'
+	compile 'name.valery1707:jcommander-validator-number:0.1.0'
+	compile 'name.valery1707:jcommander-validator-io:0.1.0'
 	compile 'commons-io:commons-io:2.5'
 	compile 'org.apache.commons:commons-lang3:3.5'
 

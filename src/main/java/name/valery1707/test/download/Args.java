@@ -1,10 +1,10 @@
 package name.valery1707.test.download;
 
 import com.beust.jcommander.Parameter;
+import name.valery1707.jcommander.validators.io.ExistsDirectoryWritable;
+import name.valery1707.jcommander.validators.io.ExistsFileReadable;
+import name.valery1707.jcommander.validators.number.GreaterThenZero;
 import name.valery1707.test.download.args.BytesConverter;
-import name.valery1707.test.download.args.GreaterThenZero;
-import name.valery1707.test.download.args.IsReadableFile;
-import name.valery1707.test.download.args.IsWritableDir;
 
 import java.io.File;
 
@@ -30,7 +30,7 @@ public class Args {
 	@Parameter(
 			names = {"-f"}
 			, description = "File with links list"
-			, validateValueWith = IsReadableFile.class
+			, validateValueWith = ExistsFileReadable.class
 			, required = true
 	)
 	private File sourceFile;
@@ -38,7 +38,7 @@ public class Args {
 	@Parameter(
 			names = {"-o"}
 			, description = "Target directory"
-			, validateValueWith = IsWritableDir.class
+			, validateValueWith = ExistsDirectoryWritable.class
 			, required = true
 	)
 	private File targetDirectory;

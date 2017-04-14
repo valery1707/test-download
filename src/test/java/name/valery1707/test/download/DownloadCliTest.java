@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static name.valery1707.test.download.Utils.bytesToDisplaySize;
-import static name.valery1707.test.download.args.IsWritableDirTest.TMP_FILE_SUFFIX;
+import static name.valery1707.test.download.SourceLoaderTest.TMP_FILE_SUFFIX;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class DownloadCliTest {
